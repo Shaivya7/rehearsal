@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "src/app/api/runs/[id]/execute-next/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/runs/[id]/report/route.ts": {
+      "maxDuration": 120
+    }
+  }
+}

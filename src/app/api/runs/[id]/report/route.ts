@@ -16,7 +16,7 @@ export async function GET(
   const safeName = run.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()
   const filename = `rehearsal-${safeName}-${id.slice(0, 8)}.xlsx`
 
-  return new NextResponse(buffer, {
+  return new NextResponse(buffer as unknown as BodyInit, {
     headers: {
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': `attachment; filename="${filename}"`,
