@@ -43,38 +43,61 @@ export function TestCaseTable({ runId, initialTcs }: Props) {
   }
 
   return (
-    <div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm border-collapse">
-          <thead>
-            <tr className="bg-slate-100 text-left text-slate-600 text-xs uppercase tracking-wide">
-              <th className="px-3 py-2 w-20">ID</th>
-              <th className="px-3 py-2">Name</th>
-              <th className="px-3 py-2">What Is Tested</th>
-              <th className="px-3 py-2 w-28">Status</th>
-              <th className="px-3 py-2 w-28">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tcs.map(tc => (
-              <TestCaseRow
-                key={tc.id}
-                tc={tc}
-                onUpdate={handleUpdate}
-                onDelete={handleDelete}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="px-3 py-2 border-t">
-        <button
-          onClick={handleAdd}
-          className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 border border-dashed border-slate-300 rounded px-3 py-1.5 hover:border-slate-500 transition-colors"
-        >
-          <Plus size={14} /> Add Test Case
-        </button>
-      </div>
+    <div className="rounded-lg border border-border overflow-hidden">
+      {tcs.length === 0 ? (
+        <div className="py-14 text-center">
+          <p className="font-display text-lg font-light text-ink-3 mb-1">No test cases yet</p>
+          <p className="text-xs text-ink-3 mb-5">
+            Generate from the prompt above, or add one manually.
+          </p>
+          <button
+            onClick={handleAdd}
+            className="inline-flex items-center gap-1.5 text-sm text-gold border border-gold/30 rounded px-4 py-2 hover:bg-gold/10 transition-colors font-medium"
+          >
+            <Plus size={14} /> Add Test Case
+          </button>
+        </div>
+      ) : (
+        <>
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="px-4 py-3 text-left text-[10px] font-mono uppercase tracking-widest text-ink-3 w-20">
+                  ID
+                </th>
+                <th className="px-4 py-3 text-left text-[10px] font-mono uppercase tracking-widest text-ink-3">
+                  Name
+                </th>
+                <th className="px-4 py-3 text-left text-[10px] font-mono uppercase tracking-widest text-ink-3 hidden md:table-cell">
+                  What Is Tested
+                </th>
+                <th className="px-4 py-3 text-left text-[10px] font-mono uppercase tracking-widest text-ink-3 w-28">
+                  Status
+                </th>
+                <th className="px-4 py-3 w-24" />
+              </tr>
+            </thead>
+            <tbody>
+              {tcs.map(tc => (
+                <TestCaseRow
+                  key={tc.id}
+                  tc={tc}
+                  onUpdate={handleUpdate}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </tbody>
+          </table>
+          <div className="px-4 py-3 border-t border-border">
+            <button
+              onClick={handleAdd}
+              className="flex items-center gap-1.5 text-xs font-mono text-ink-3 hover:text-gold border border-dashed border-border hover:border-gold/40 rounded px-3 py-1.5 transition-colors duration-150"
+            >
+              <Plus size={12} /> Add Test Case
+            </button>
+          </div>
+        </>
+      )}
     </div>
   )
 }

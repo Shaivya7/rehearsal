@@ -53,20 +53,21 @@ export default function NewRunPage() {
     router.push(`/runs/${run.id}`)
   }
 
-  return (
-    <div className="max-w-2xl">
-      <h1 className="text-2xl font-bold text-slate-900 mb-1">New Run</h1>
-      <p className="text-slate-500 text-sm mb-6">
-        Import a bot system prompt. A plain-English summary is generated automatically.
-      </p>
+  const labelCls = "block text-[10px] font-mono uppercase tracking-widest text-ink-3 mb-2"
+  const inputCls = "w-full bg-surface border border-border rounded px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:outline-none focus:border-gold/50 transition-colors"
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+  return (
+    <div className="max-w-2xl fade-up">
+      <p className="text-[11px] font-mono text-ink-3 uppercase tracking-widest mb-2">New Run</p>
+      <h1 className="font-display text-3xl font-light text-ink tracking-tight mb-8">
+        Import a prompt
+      </h1>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Run name <span className="text-red-500">*</span>
-          </label>
+          <label className={labelCls}>Run name <span className="text-fail">*</span></label>
           <input
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+            className={inputCls}
             placeholder="e.g. BankBazaar SBI Credit Card v3"
             value={name}
             onChange={e => setName(e.target.value)}
@@ -74,57 +75,48 @@ export default function NewRunPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Prompt <span className="text-red-500">*</span>
-          </label>
+          <label className={labelCls}>Prompt <span className="text-fail">*</span></label>
           <div className="mb-2 flex items-center gap-3">
-            <label className="cursor-pointer flex items-center gap-1.5 text-sm text-slate-600 border rounded px-3 py-1.5 hover:bg-slate-50 transition-colors">
-              <Upload size={14} />
+            <label className="cursor-pointer flex items-center gap-1.5 text-xs font-mono text-ink-2 border border-border rounded px-3 py-1.5 hover:border-rim hover:text-ink transition-colors">
+              <Upload size={12} />
               {uploading ? 'Uploading…' : 'Upload PDF or DOCX'}
-              <input
-                type="file"
-                accept=".pdf,.docx"
-                className="hidden"
-                onChange={handleFileUpload}
-              />
+              <input type="file" accept=".pdf,.docx" className="hidden" onChange={handleFileUpload} />
             </label>
             {uploadedFilename && (
-              <span className="flex items-center gap-1 text-xs text-slate-500">
-                <FileText size={12} /> {uploadedFilename}
+              <span className="flex items-center gap-1 text-[11px] font-mono text-gold">
+                <FileText size={11} /> {uploadedFilename}
               </span>
             )}
           </div>
           <textarea
-            className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-slate-400 h-72 resize-y"
-            placeholder="Or paste your bot system prompt here…"
+            className={`${inputCls} font-mono text-xs h-72 resize-y leading-relaxed`}
+            placeholder="…or paste your bot system prompt here"
             value={promptText}
             onChange={e => setPromptText(e.target.value)}
           />
-          <p className="text-xs text-slate-400 mt-1">
-            {promptText.length.toLocaleString()} characters
+          <p className="text-[10px] font-mono text-ink-3 mt-1.5 flex items-center gap-2">
+            <span>{promptText.length.toLocaleString()} chars</span>
             {promptText.length > 50000 && (
-              <span className="text-amber-600 ml-2">⚠ Large prompt — may be slow</span>
+              <span className="text-partial">⚠ Large prompt — may be slow</span>
             )}
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Max turns per test case
-          </label>
-          <input
-            type="number"
-            min={6}
-            max={24}
-            className="w-28 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
-            value={maxTurns}
-            onChange={e => setMaxTurns(Number(e.target.value))}
-          />
-          <p className="text-xs text-slate-400 mt-1">6–24 turns. Default 16.</p>
+          <label className={labelCls}>Max turns per test case</label>
+          <div className="flex items-center gap-3">
+            <input
+              type="number" min={6} max={24}
+              className={`${inputCls} w-24`}
+              value={maxTurns}
+              onChange={e => setMaxTurns(Number(e.target.value))}
+            />
+            <span className="text-[11px] font-mono text-ink-3">6 – 24 · default 16</span>
+          </div>
         </div>
 
         {error && (
-          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
+          <p className="text-xs font-mono text-fail bg-fail/5 border border-fail/20 rounded px-3 py-2">
             {error}
           </p>
         )}
@@ -132,9 +124,14 @@ export default function NewRunPage() {
         <button
           type="submit"
           disabled={loading}
-          className="bg-slate-900 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-2 bg-gold text-bg px-6 py-2.5 rounded text-sm font-semibold hover:bg-gold/90 disabled:opacity-50 transition-colors"
         >
-          {loading ? 'Creating run + generating summary…' : 'Create Run →'}
+          {loading ? (
+            <>
+              <div className="w-3.5 h-3.5 border-2 border-bg/30 border-t-bg rounded-full animate-spin" />
+              Creating run + generating summary…
+            </>
+          ) : 'Create Run →'}
         </button>
       </form>
     </div>

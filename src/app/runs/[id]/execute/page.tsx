@@ -6,11 +6,7 @@ import type { StatusResponse } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
 
-export default async function ExecutePage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
+export default async function ExecutePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const run = await getRun(id)
   if (!run) notFound()
@@ -27,18 +23,16 @@ export default async function ExecutePage({
   }
 
   return (
-    <div className="max-w-2xl">
-      <div className="mb-6">
-        <Link href={`/runs/${id}`} className="text-sm text-slate-500 hover:text-slate-700">
-          ← Back to run
-        </Link>
-        <h1 className="text-2xl font-bold text-slate-900 mt-1">{run.name}</h1>
-        <p className="text-slate-500 text-sm">
-          {run.testCases.length} test cases · {run.model} · max {run.maxTurns} turns each
-        </p>
-      </div>
+    <div className="max-w-xl fade-up">
+      <Link href={`/runs/${id}`} className="text-[11px] font-mono text-ink-3 hover:text-gold transition-colors">
+        ← Back to run
+      </Link>
+      <h1 className="font-display text-3xl font-light text-ink mt-2 mb-1">{run.name}</h1>
+      <p className="text-[11px] font-mono text-ink-3 mb-8">
+        {run.testCases.length} test cases · {run.model} · max {run.maxTurns} turns each
+      </p>
 
-      <div className="bg-white border rounded-lg p-6">
+      <div className="bg-surface border border-border rounded-lg p-6">
         <ExecutionPoller runId={id} initialStatus={initialStatus} />
       </div>
     </div>

@@ -19,16 +19,13 @@ export function ExecutionPoller({ runId, initialStatus }: Props) {
     if (res.ok) {
       const s = await res.json() as StatusResponse
       setStatus(s)
-      return s
     }
-    return null
   }, [runId])
 
   const runLoop = useCallback(async () => {
     if (runningRef.current) return
     runningRef.current = true
     setError(null)
-
     try {
       while (true) {
         const res = await fetch(`/api/runs/${runId}/execute-next`, { method: 'POST' })
@@ -56,83 +53,79 @@ export function ExecutionPoller({ runId, initialStatus }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const progress =
-    status.totalTcs > 0 ? Math.round((status.completedTcs / status.totalTcs) * 100) : 0
+  const progress = status.totalTcs > 0
+    ? Math.round((status.completedTcs / status.totalTcs) * 100)
+    : 0
 
   return (
-    <div className="space-y-5">
-      {/* Progress bar */}
+    <div className="space-y-6">
+      {/* Current TC */}
       <div>
-        <div className="flex justify-between text-sm text-slate-600 mb-1.5">
-          <span>
+        <div className="flex justify-between items-baseline mb-2">
+          <p className="text-xs font-mono text-ink-3">
             {status.completedTcs < status.totalTcs
-              ? `Running TC ${status.completedTcs + 1} of ${status.totalTcs}${
-                  status.currentTcName ? ` — ${status.currentTcName}` : ''
-                }`
-              : 'All test cases complete'}
-          </span>
-          <span className="font-medium">{progress}%</span>
+              ? <>TC <span className="text-gold">{status.completedTcs + 1}</span> of {status.totalTcs}{status.currentTcName ? ` · ${status.currentTcName}` : ''}</>
+              : <span className="text-pass">All test cases complete</span>
+            }
+          </p>
+          <span className="font-mono text-sm font-semibold text-ink">{progress}%</span>
         </div>
-        <div className="w-full bg-slate-200 rounded-full h-2.5">
+        <div className="h-1.5 bg-border rounded-full overflow-hidden">
           <div
-            className="bg-blue-600 h-2.5 rounded-full transition-all duration-700"
+            className="h-full bg-gold rounded-full transition-all duration-700 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
       </div>
 
-      {/* Live stats */}
-      <div className="grid grid-cols-4 gap-3 text-center">
+      {/* Stats */}
+      <div className="grid grid-cols-4 gap-2">
         {[
-          { label: 'Pass', count: status.passCount, color: 'text-green-700' },
-          { label: 'Fail', count: status.failCount, color: 'text-red-700' },
-          { label: 'Partial', count: status.partialCount, color: 'text-amber-700' },
-          { label: 'Done', count: status.completedTcs, color: 'text-slate-700' },
-        ].map(({ label, count, color }) => (
-          <div key={label} className="border rounded-lg p-3">
-            <p className={`text-2xl font-bold ${color}`}>{count}</p>
-            <p className="text-xs text-slate-500 mt-0.5">{label}</p>
+          { label: 'Pass',    val: status.passCount,    color: 'text-pass' },
+          { label: 'Fail',    val: status.failCount,    color: 'text-fail' },
+          { label: 'Partial', val: status.partialCount, color: 'text-partial' },
+          { label: 'Done',    val: status.completedTcs, color: 'text-ink' },
+        ].map(({ label, val, color }) => (
+          <div key={label} className="bg-bg border border-border rounded-lg py-4 text-center">
+            <p className={`font-display text-3xl font-light ${color}`}>{val}</p>
+            <p className="text-[10px] font-mono text-ink-3 mt-0.5 uppercase tracking-wider">{label}</p>
           </div>
         ))}
       </div>
 
       {/* Spinner */}
       {!error && status.completedTcs < status.totalTcs && (
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center gap-2.5 text-xs text-ink-3 font-mono">
+          <div className="w-3 h-3 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
           Executing test cases…
         </div>
       )}
 
-      {/* Error with retry */}
+      {/* Error */}
       {error && (
-        <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-3">
+        <div className="text-xs font-mono text-fail bg-fail/5 border border-fail/20 rounded p-3">
           <p>Error: {error}</p>
-          <button
-            onClick={runLoop}
-            className="mt-2 underline text-red-700"
-          >
+          <button onClick={runLoop} className="mt-2 text-fail/70 hover:text-fail underline">
             Retry from last completed TC
           </button>
         </div>
       )}
 
       {/* Actions */}
-      <div className="flex gap-3 pt-1">
+      <div className="flex items-center justify-between pt-2 border-t border-border">
         <button
           onClick={async () => {
             await fetch(`/api/runs/${runId}/abort`, { method: 'POST' })
             router.push(`/runs/${runId}/results`)
           }}
-          className="text-sm text-red-500 hover:text-red-700 hover:underline"
+          className="text-xs font-mono text-ink-3 hover:text-fail transition-colors"
         >
           Abort run
         </button>
+        <p className="text-[10px] font-mono text-ink-3">
+          Keep this tab open · share URL to monitor
+        </p>
       </div>
-
-      <p className="text-xs text-slate-400 border-t pt-3">
-        Keep this tab open while executing. Share this URL with a teammate to let them monitor.
-      </p>
     </div>
   )
 }

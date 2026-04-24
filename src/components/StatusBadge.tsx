@@ -2,25 +2,25 @@ import type { Verdict, RunStatus } from '@/lib/types'
 
 type Status = Verdict | RunStatus
 
-const styles: Record<string, string> = {
-  PASS: 'bg-green-100 text-green-800 border-green-300',
-  FAIL: 'bg-red-100 text-red-800 border-red-300',
-  PARTIAL: 'bg-amber-100 text-amber-800 border-amber-300',
-  ERROR: 'bg-gray-100 text-gray-600 border-gray-300',
-  PENDING: 'bg-slate-100 text-slate-500 border-slate-300',
-  running: 'bg-blue-100 text-blue-800 border-blue-300',
-  completed: 'bg-green-100 text-green-800 border-green-300',
-  ready: 'bg-indigo-100 text-indigo-800 border-indigo-300',
-  draft: 'bg-slate-100 text-slate-500 border-slate-300',
-  aborted: 'bg-orange-100 text-orange-800 border-orange-300',
-  error: 'bg-red-100 text-red-700 border-red-300',
+const cfg: Record<string, { dot: string; text: string; border: string }> = {
+  PASS:      { dot: 'bg-pass',     text: 'text-pass',    border: 'border-pass/30' },
+  FAIL:      { dot: 'bg-fail',     text: 'text-fail',    border: 'border-fail/30' },
+  PARTIAL:   { dot: 'bg-partial',  text: 'text-partial', border: 'border-partial/30' },
+  ERROR:     { dot: 'bg-ink-3',    text: 'text-ink-3',   border: 'border-rim/50' },
+  PENDING:   { dot: 'bg-ink-3',    text: 'text-ink-3',   border: 'border-rim/50' },
+  running:   { dot: 'bg-blue',     text: 'text-blue',    border: 'border-blue/30' },
+  completed: { dot: 'bg-pass',     text: 'text-pass',    border: 'border-pass/30' },
+  ready:     { dot: 'bg-gold',     text: 'text-gold',    border: 'border-gold/30' },
+  draft:     { dot: 'bg-ink-3',    text: 'text-ink-3',   border: 'border-rim/50' },
+  aborted:   { dot: 'bg-orange',   text: 'text-orange',  border: 'border-orange/30' },
+  error:     { dot: 'bg-fail',     text: 'text-fail',    border: 'border-fail/30' },
 }
 
 export function StatusBadge({ status }: { status: Status }) {
+  const s = cfg[status] ?? cfg.PENDING
   return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded border text-xs font-medium ${styles[status] ?? styles.PENDING}`}
-    >
+    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border ${s.border} bg-surface text-[11px] font-medium font-mono tracking-wide ${s.text}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${s.dot} ${status === 'running' ? 'pulse-gold' : ''}`} />
       {status}
     </span>
   )

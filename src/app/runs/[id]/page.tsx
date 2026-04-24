@@ -7,11 +7,7 @@ import { GenerateTcsButton } from '@/components/GenerateTcsButton'
 
 export const dynamic = 'force-dynamic'
 
-export default async function RunDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
+export default async function RunDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const run = await getRun(id)
   if (!run) notFound()
@@ -20,39 +16,42 @@ export default async function RunDetailPage({
   if (run.status === 'running') redirect(`/runs/${id}/execute`)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 fade-up">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold text-slate-900">{run.name}</h1>
+          <Link href="/" className="text-[11px] font-mono text-ink-3 hover:text-gold transition-colors">
+            ← All runs
+          </Link>
+          <div className="flex items-center gap-3 mt-2 flex-wrap">
+            <h1 className="font-display text-3xl font-light text-ink">{run.name}</h1>
             <StatusBadge status={run.status} />
           </div>
-          <p className="text-slate-500 text-sm mt-0.5">
-            {new Date(run.createdAt).toLocaleString()} · {run.model} · max {run.maxTurns} turns
+          <p className="text-[11px] font-mono text-ink-3 mt-1.5">
+            {new Date(run.createdAt).toLocaleString()} · {run.model} · {run.maxTurns} turns max
           </p>
         </div>
         {run.testCases.length > 0 && (
           <Link
             href={`/runs/${id}/execute`}
-            className="shrink-0 bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+            className="shrink-0 bg-blue text-bg px-5 py-2 rounded text-sm font-semibold hover:bg-blue/90 transition-colors"
           >
-            Run All ({run.testCases.length} TCs) →
+            Run All ({run.testCases.length}) →
           </Link>
         )}
       </div>
 
       {/* Prompt Summary */}
-      <div className="bg-white border rounded-lg p-4">
-        <p className="text-xs font-semibold uppercase text-slate-400 tracking-wide mb-2">
+      <div className="bg-surface border border-border rounded-lg p-5">
+        <p className="text-[10px] font-mono uppercase tracking-widest text-ink-3 mb-3">
           Prompt Summary
         </p>
-        <p className="text-slate-700 text-sm leading-relaxed">{run.promptSummary}</p>
-        <details className="mt-3">
-          <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-600 select-none">
-            View raw prompt ({run.promptText.length.toLocaleString()} chars)
+        <p className="text-sm text-ink-2 leading-relaxed">{run.promptSummary}</p>
+        <details className="mt-4">
+          <summary className="text-[11px] font-mono text-ink-3 hover:text-gold cursor-pointer select-none transition-colors">
+            ▸ View raw prompt ({run.promptText.length.toLocaleString()} chars)
           </summary>
-          <pre className="mt-2 text-xs text-slate-600 font-mono bg-slate-50 rounded p-3 overflow-x-auto whitespace-pre-wrap max-h-64 border">
+          <pre className="mt-3 text-[11px] font-mono text-ink-3 bg-bg border border-border rounded p-3 overflow-x-auto whitespace-pre-wrap max-h-60 leading-relaxed">
             {run.promptText}
           </pre>
         </details>
@@ -60,15 +59,19 @@ export default async function RunDetailPage({
 
       {/* Test Cases */}
       <div>
-        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-          <h2 className="text-lg font-semibold text-slate-900">
-            Test Cases{' '}
-            {run.testCases.length > 0 && (
-              <span className="text-slate-400 font-normal text-base">
-                ({run.testCases.length})
-              </span>
-            )}
-          </h2>
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-ink-3 mb-1">
+              Test Cases
+            </p>
+            <h2 className="font-display text-xl font-light text-ink">
+              {run.testCases.length > 0 ? (
+                <>{run.testCases.length} cases ready</>
+              ) : (
+                <>No cases yet</>
+              )}
+            </h2>
+          </div>
           <GenerateTcsButton
             runId={id}
             label={run.testCases.length === 0 ? 'Generate Test Cases' : 'Regenerate'}
@@ -76,19 +79,8 @@ export default async function RunDetailPage({
           />
         </div>
 
-        {run.testCases.length === 0 ? (
-          <div className="border-2 border-dashed rounded-lg p-12 text-center text-slate-400">
-            <p className="text-base">No test cases yet.</p>
-            <p className="text-sm mt-1">
-              Click &ldquo;Generate Test Cases&rdquo; to auto-generate them from the prompt, or add
-              manually below.
-            </p>
-          </div>
-        ) : (
-          <div className="bg-white border rounded-lg overflow-hidden">
-            <TestCaseTable runId={id} initialTcs={run.testCases} />
-          </div>
-        )}
+        {/* TestCaseTable is always rendered — handles empty state + Add button internally */}
+        <TestCaseTable runId={id} initialTcs={run.testCases} />
       </div>
     </div>
   )

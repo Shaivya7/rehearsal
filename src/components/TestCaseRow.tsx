@@ -24,85 +24,48 @@ export function TestCaseRow({ tc, onUpdate, onDelete }: Props) {
     onUpdate(tc.id, draft)
     setEditing(false)
   }
-
   function cancel() {
-    setDraft({
-      name: tc.name,
-      whatIsTested: tc.whatIsTested,
-      leadBehaviourScript: tc.leadBehaviourScript,
-      passCriterion: tc.passCriterion,
-    })
+    setDraft({ name: tc.name, whatIsTested: tc.whatIsTested, leadBehaviourScript: tc.leadBehaviourScript, passCriterion: tc.passCriterion })
     setEditing(false)
   }
 
+  const inputCls = "w-full bg-elevated border border-rim rounded px-2 py-1 text-xs text-ink font-sans focus:outline-none focus:border-gold/50 transition-colors"
+  const textareaCls = `${inputCls} h-20 resize-y`
+
   return (
     <>
-      <tr className="border-b hover:bg-slate-50 text-sm">
-        <td className="px-3 py-2 text-slate-500 font-mono text-xs whitespace-nowrap">{tc.id}</td>
-        <td className="px-3 py-2">
+      <tr className={`border-b border-border text-sm transition-colors ${expanded ? 'bg-elevated' : 'hover:bg-surface/60'}`}>
+        <td className="px-4 py-3 font-mono text-[11px] text-ink-3 whitespace-nowrap">{tc.id}</td>
+        <td className="px-4 py-3">
           {editing ? (
-            <input
-              className="w-full border rounded px-2 py-1 text-sm"
-              value={draft.name}
-              onChange={e => setDraft(d => ({ ...d, name: e.target.value }))}
-            />
+            <input className={inputCls} value={draft.name} onChange={e => setDraft(d => ({ ...d, name: e.target.value }))} />
           ) : (
-            <span className="font-medium">{tc.name}</span>
+            <span className="text-ink font-medium text-[13px]">{tc.name || <span className="text-ink-3 italic">Untitled</span>}</span>
           )}
         </td>
-        <td className="px-3 py-2 text-slate-600 max-w-xs">
+        <td className="px-4 py-3 text-ink-2 text-xs hidden md:table-cell max-w-xs">
           {editing ? (
-            <input
-              className="w-full border rounded px-2 py-1 text-sm"
-              value={draft.whatIsTested}
-              onChange={e => setDraft(d => ({ ...d, whatIsTested: e.target.value }))}
-            />
+            <input className={inputCls} value={draft.whatIsTested} onChange={e => setDraft(d => ({ ...d, whatIsTested: e.target.value }))} />
           ) : (
-            tc.whatIsTested
+            <span className="line-clamp-2">{tc.whatIsTested}</span>
           )}
         </td>
-        <td className="px-3 py-2">
+        <td className="px-4 py-3">
           <StatusBadge status={tc.verdict} />
         </td>
-        <td className="px-3 py-2">
-          <div className="flex items-center gap-1">
+        <td className="px-4 py-3">
+          <div className="flex items-center gap-1 justify-end">
             {editing ? (
               <>
-                <button
-                  onClick={save}
-                  className="p-1 text-green-600 hover:bg-green-50 rounded"
-                >
-                  <Check size={14} />
-                </button>
-                <button
-                  onClick={cancel}
-                  className="p-1 text-slate-500 hover:bg-slate-100 rounded"
-                >
-                  <X size={14} />
-                </button>
+                <button onClick={save} className="p-1.5 rounded text-pass hover:bg-pass/10 transition-colors"><Check size={13} /></button>
+                <button onClick={cancel} className="p-1.5 rounded text-ink-3 hover:bg-rim/20 transition-colors"><X size={13} /></button>
               </>
             ) : (
               <>
-                <button
-                  onClick={() => setEditing(true)}
-                  className="p-1 text-slate-500 hover:bg-slate-100 rounded"
-                  title="Edit"
-                >
-                  <Pencil size={14} />
-                </button>
-                <button
-                  onClick={() => onDelete(tc.id)}
-                  className="p-1 text-red-400 hover:bg-red-50 rounded"
-                  title="Delete"
-                >
-                  <Trash2 size={14} />
-                </button>
-                <button
-                  onClick={() => setExpanded(e => !e)}
-                  className="p-1 text-slate-500 hover:bg-slate-100 rounded"
-                  title="Expand"
-                >
-                  {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                <button onClick={() => setEditing(true)} className="p-1.5 rounded text-ink-3 hover:text-ink hover:bg-rim/20 transition-colors"><Pencil size={13} /></button>
+                <button onClick={() => onDelete(tc.id)} className="p-1.5 rounded text-ink-3 hover:text-fail hover:bg-fail/10 transition-colors"><Trash2 size={13} /></button>
+                <button onClick={() => setExpanded(e => !e)} className="p-1.5 rounded text-ink-3 hover:text-ink hover:bg-rim/20 transition-colors">
+                  {expanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
                 </button>
               </>
             )}
@@ -111,68 +74,52 @@ export function TestCaseRow({ tc, onUpdate, onDelete }: Props) {
       </tr>
 
       {expanded && (
-        <tr className="bg-slate-50 border-b">
-          <td colSpan={5} className="px-4 py-3">
-            <div className="grid grid-cols-2 gap-4 text-sm">
+        <tr className="border-b border-border bg-bg">
+          <td colSpan={5} className="px-4 py-4">
+            <div className="grid grid-cols-2 gap-4 text-xs mb-4">
               <div>
-                <p className="font-semibold text-slate-700 mb-1">Lead Behaviour Script</p>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-ink-3 mb-2">Lead Behaviour Script</p>
                 {editing ? (
-                  <textarea
-                    className="w-full border rounded px-2 py-1 text-sm h-24 resize-y"
-                    value={draft.leadBehaviourScript}
-                    onChange={e =>
-                      setDraft(d => ({ ...d, leadBehaviourScript: e.target.value }))
-                    }
-                  />
+                  <textarea className={textareaCls} value={draft.leadBehaviourScript} onChange={e => setDraft(d => ({ ...d, leadBehaviourScript: e.target.value }))} />
                 ) : (
-                  <p className="text-slate-600 leading-relaxed">{tc.leadBehaviourScript}</p>
+                  <p className="text-ink-2 leading-relaxed">{tc.leadBehaviourScript || <span className="italic text-ink-3">Not set</span>}</p>
                 )}
               </div>
               <div>
-                <p className="font-semibold text-slate-700 mb-1">Pass Criterion</p>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-ink-3 mb-2">Pass Criterion</p>
                 {editing ? (
-                  <textarea
-                    className="w-full border rounded px-2 py-1 text-sm h-24 resize-y"
-                    value={draft.passCriterion}
-                    onChange={e =>
-                      setDraft(d => ({ ...d, passCriterion: e.target.value }))
-                    }
-                  />
+                  <textarea className={textareaCls} value={draft.passCriterion} onChange={e => setDraft(d => ({ ...d, passCriterion: e.target.value }))} />
                 ) : (
-                  <p className="text-slate-600 leading-relaxed">{tc.passCriterion}</p>
+                  <p className="text-ink-2 leading-relaxed">{tc.passCriterion || <span className="italic text-ink-3">Not set</span>}</p>
                 )}
               </div>
             </div>
 
             {tc.turns.length > 0 && (
-              <div className="mt-3">
-                <p className="font-semibold text-slate-700 mb-1 text-sm">
-                  Transcript ({tc.turns.length} turns)
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-ink-3 mb-2">
+                  Transcript · {tc.turns.length} turns
                 </p>
-                <div className="space-y-1 max-h-52 overflow-y-auto border rounded bg-white p-2">
+                <div className="space-y-1.5 max-h-52 overflow-y-auto border border-border rounded bg-surface p-3">
                   {tc.turns.map(turn => (
-                    <div key={turn.number} className="text-xs">
-                      <span
-                        className={`font-semibold mr-2 ${
-                          turn.speaker === 'Agent' ? 'text-blue-700' : 'text-slate-600'
-                        }`}
-                      >
-                        [{turn.number}] {turn.speaker}:
+                    <div key={turn.number} className="text-xs flex gap-2">
+                      <span className={`shrink-0 font-mono text-[10px] w-20 ${turn.speaker === 'Agent' ? 'text-blue' : 'text-gold'}`}>
+                        [{turn.number}] {turn.speaker}
                       </span>
-                      <span className="text-slate-700">{turn.text}</span>
+                      <span className="text-ink-2">{turn.text}</span>
                     </div>
                   ))}
                 </div>
                 {tc.remarks && (
-                  <p className="mt-2 text-xs text-slate-600 bg-amber-50 border border-amber-200 rounded p-2">
-                    <span className="font-semibold">Remarks: </span>
+                  <div className="mt-2 text-xs text-ink-2 bg-elevated border border-border rounded p-3 leading-relaxed">
+                    <span className="font-mono text-[10px] text-ink-3 uppercase tracking-wider mr-2">Remarks</span>
                     {tc.remarks}
-                  </p>
+                  </div>
                 )}
                 {tc.failures && tc.failures.length > 0 && (
-                  <ul className="mt-1 text-xs text-red-700 list-disc list-inside">
+                  <ul className="mt-1.5 space-y-0.5">
                     {tc.failures.map((f, i) => (
-                      <li key={i}>{f}</li>
+                      <li key={i} className="text-xs text-fail font-mono">↳ {f}</li>
                     ))}
                   </ul>
                 )}
