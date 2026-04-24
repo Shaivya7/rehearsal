@@ -27,8 +27,9 @@ export async function leadPersonaTurn(
         },
         {
           role: 'user',
-          content:
-            'Respond as the human lead. One response only. No stage directions. No quotation marks.',
+          content: history.length === 1
+            ? 'The agent just gave their opening greeting. Respond as the human lead with a short natural greeting reply — e.g. "hi", "hello", "haan", "batao", "haan bolo", "ji bolo" — keep it brief and realistic. No stage directions. No quotation marks.'
+            : 'Respond as the human lead. One response only. No stage directions. No quotation marks.',
         },
       ],
       temperature: 0.7,
