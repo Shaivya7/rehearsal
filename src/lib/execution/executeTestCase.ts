@@ -3,9 +3,10 @@ import { leadPersonaTurn } from '../llm/leadPersonaTurn'
 import { analyseTranscript } from '../llm/analyseTranscript'
 import type { Run, TestCase, Turn } from '../types'
 
-// Hard stop: agent explicitly invoked hangup_call action
+// Hard stop: agent invoked a call-ending action
 function isHangupCall(text: string): boolean {
-  return text.toLowerCase().includes('hangup_call')
+  const lower = text.toLowerCase()
+  return lower.includes('hangup_call') || lower.includes('transfer_call_with_hangup')
 }
 
 // Heuristic: detect if agent has issued a closing action

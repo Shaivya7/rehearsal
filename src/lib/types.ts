@@ -55,6 +55,13 @@ export interface AnalysisResult {
   failures: string[]
 }
 
+export interface FinishedTcSummary {
+  id: string
+  name: string
+  verdict: Verdict
+  remarks?: string
+}
+
 export interface StatusResponse {
   status: RunStatus
   completedTcs: number
@@ -63,4 +70,5 @@ export interface StatusResponse {
   passCount: number
   failCount: number
   partialCount: number
+  finishedTestCases: FinishedTcSummary[]
 }

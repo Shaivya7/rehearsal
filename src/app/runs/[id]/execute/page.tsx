@@ -11,15 +11,16 @@ export default async function ExecutePage({ params }: { params: Promise<{ id: st
   const run = await getRun(id)
   if (!run) notFound()
 
-  const completedTcs = run.testCases.filter(tc => tc.verdict !== 'PENDING').length
+  const done = run.testCases.filter(tc => tc.verdict !== 'PENDING')
   const initialStatus: StatusResponse = {
     status: run.status,
-    completedTcs,
+    completedTcs: done.length,
     totalTcs: run.testCases.length,
     currentTcName: run.testCases.find(tc => tc.verdict === 'PENDING')?.name ?? null,
-    passCount: run.testCases.filter(tc => tc.verdict === 'PASS').length,
-    failCount: run.testCases.filter(tc => tc.verdict === 'FAIL').length,
-    partialCount: run.testCases.filter(tc => tc.verdict === 'PARTIAL').length,
+    passCount: done.filter(tc => tc.verdict === 'PASS').length,
+    failCount: done.filter(tc => tc.verdict === 'FAIL').length,
+    partialCount: done.filter(tc => tc.verdict === 'PARTIAL').length,
+    finishedTestCases: done.map(tc => ({ id: tc.id, name: tc.name, verdict: tc.verdict, remarks: tc.remarks })),
   }
 
   return (

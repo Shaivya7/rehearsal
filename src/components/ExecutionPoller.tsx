@@ -1,11 +1,26 @@
 'use client'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import type { StatusResponse } from '@/lib/types'
+import type { StatusResponse, FinishedTcSummary } from '@/lib/types'
 
 interface Props {
   runId: string
   initialStatus: StatusResponse
+}
+
+const VERDICT_COLOR: Record<string, string> = {
+  PASS:    'text-pass bg-pass/10 border-pass/20',
+  FAIL:    'text-fail bg-fail/10 border-fail/20',
+  PARTIAL: 'text-partial bg-partial/10 border-partial/20',
+  ERROR:   'text-ink-3 bg-surface border-border',
+}
+
+function VerdictPill({ verdict }: { verdict: string }) {
+  return (
+    <span className={`inline-block text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border ${VERDICT_COLOR[verdict] ?? VERDICT_COLOR.ERROR}`}>
+      {verdict}
+    </span>
+  )
 }
 
 export function ExecutionPoller({ runId, initialStatus }: Props) {
@@ -59,7 +74,7 @@ export function ExecutionPoller({ runId, initialStatus }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Current TC */}
+      {/* Progress */}
       <div>
         <div className="flex justify-between items-baseline mb-2">
           <p className="text-xs font-mono text-ink-3">
@@ -108,6 +123,28 @@ export function ExecutionPoller({ runId, initialStatus }: Props) {
           <button onClick={runLoop} className="mt-2 text-fail/70 hover:text-fail underline">
             Retry from last completed TC
           </button>
+        </div>
+      )}
+
+      {/* Completed TCs live view */}
+      {status.finishedTestCases.length > 0 && (
+        <div>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-ink-3 mb-3">
+            Completed · {status.finishedTestCases.length} of {status.totalTcs}
+          </p>
+          <div className="rounded-lg border border-border overflow-hidden divide-y divide-border">
+            {status.finishedTestCases.map((tc: FinishedTcSummary) => (
+              <div key={tc.id} className="flex items-start gap-3 px-4 py-3">
+                <VerdictPill verdict={tc.verdict} />
+                <div className="min-w-0">
+                  <p className="text-sm text-ink truncate">{tc.name}</p>
+                  {tc.remarks && (
+                    <p className="text-[11px] font-mono text-ink-3 mt-0.5 line-clamp-1">{tc.remarks}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

@@ -13,14 +13,22 @@ export async function GET(
   const completedTcs = run.testCases.filter(tc => tc.verdict !== 'PENDING').length
   const currentPending = run.testCases.find(tc => tc.verdict === 'PENDING')
 
+  const done = run.testCases.filter(tc => tc.verdict !== 'PENDING')
+
   const status: StatusResponse = {
     status: run.status,
     completedTcs,
     totalTcs: run.testCases.length,
     currentTcName: currentPending?.name ?? null,
-    passCount: run.testCases.filter(tc => tc.verdict === 'PASS').length,
-    failCount: run.testCases.filter(tc => tc.verdict === 'FAIL').length,
-    partialCount: run.testCases.filter(tc => tc.verdict === 'PARTIAL').length,
+    passCount: done.filter(tc => tc.verdict === 'PASS').length,
+    failCount: done.filter(tc => tc.verdict === 'FAIL').length,
+    partialCount: done.filter(tc => tc.verdict === 'PARTIAL').length,
+    finishedTestCases: done.map(tc => ({
+      id: tc.id,
+      name: tc.name,
+      verdict: tc.verdict,
+      remarks: tc.remarks,
+    })),
   }
 
   return NextResponse.json(status)

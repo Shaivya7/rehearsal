@@ -22,9 +22,12 @@ Return a JSON object with a "testCases" array. No markdown, no explanation. Each
   "source": "generated"
 }`
 
-export async function generateTestCases(promptText: string, dynamicVariables?: string): Promise<TestCase[]> {
+export async function generateTestCases(promptText: string, dynamicVariables?: string, instructions?: string): Promise<TestCase[]> {
   const varsBlock = dynamicVariables?.trim()
     ? `\n\nDYNAMIC VARIABLES (these replace {{placeholders}} in the prompt and greeting):\n${dynamicVariables}`
+    : ''
+  const instructionsBlock = instructions?.trim()
+    ? `\n\nSPECIAL INSTRUCTIONS FROM THE USER (follow these above all else when deciding which test cases to generate):\n${instructions}`
     : ''
 
   const response = await withRetry(() =>
@@ -34,7 +37,7 @@ export async function generateTestCases(promptText: string, dynamicVariables?: s
         { role: 'system', content: SYSTEM_PROMPT },
         {
           role: 'user',
-          content: `Here is the bot prompt to analyse:\n---\n${promptText}\n---${varsBlock}\nGenerate all test cases.`,
+          content: `Here is the bot prompt to analyse:\n---\n${promptText}\n---${varsBlock}${instructionsBlock}\nGenerate all test cases.`,
         },
       ],
       temperature: 0.3,
