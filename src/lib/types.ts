@@ -29,6 +29,8 @@ export interface Run {
   createdAt: string
   promptText: string
   promptSummary: string
+  greetingText?: string
+  dynamicVariables?: string
   model: string
   maxTurns: number
   status: RunStatus

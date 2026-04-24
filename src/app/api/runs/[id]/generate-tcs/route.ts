@@ -10,7 +10,7 @@ export async function POST(
   const run = await getRun(id)
   if (!run) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const testCases = await generateTestCases(run.promptText)
+  const testCases = await generateTestCases(run.promptText, run.dynamicVariables)
   run.testCases = testCases
   run.status = 'ready'
   await saveRun(run)

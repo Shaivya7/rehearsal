@@ -4,10 +4,15 @@ import type { Turn } from '../types'
 
 export async function agentTurn(
   botPrompt: string,
-  history: Turn[]
+  history: Turn[],
+  dynamicVariables?: string
 ): Promise<{ text: string; tokens: number }> {
+  const systemContent = dynamicVariables?.trim()
+    ? `${botPrompt}\n\nDYNAMIC VARIABLES (these replace {{placeholders}} in your responses):\n${dynamicVariables}`
+    : botPrompt
+
   const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-    { role: 'system', content: botPrompt },
+    { role: 'system', content: systemContent },
     ...history.map(t => ({
       role: t.speaker === 'Lead' ? ('user' as const) : ('assistant' as const),
       content: t.text,

@@ -22,7 +22,11 @@ Return a JSON object with a "testCases" array. No markdown, no explanation. Each
   "source": "generated"
 }`
 
-export async function generateTestCases(promptText: string): Promise<TestCase[]> {
+export async function generateTestCases(promptText: string, dynamicVariables?: string): Promise<TestCase[]> {
+  const varsBlock = dynamicVariables?.trim()
+    ? `\n\nDYNAMIC VARIABLES (these replace {{placeholders}} in the prompt and greeting):\n${dynamicVariables}`
+    : ''
+
   const response = await withRetry(() =>
     openai.chat.completions.create({
       model: MODEL,
@@ -30,7 +34,7 @@ export async function generateTestCases(promptText: string): Promise<TestCase[]>
         { role: 'system', content: SYSTEM_PROMPT },
         {
           role: 'user',
-          content: `Here is the bot prompt to analyse:\n---\n${promptText}\n---\nGenerate all test cases.`,
+          content: `Here is the bot prompt to analyse:\n---\n${promptText}\n---${varsBlock}\nGenerate all test cases.`,
         },
       ],
       temperature: 0.3,

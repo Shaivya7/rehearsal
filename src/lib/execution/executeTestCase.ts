@@ -25,15 +25,29 @@ function isClosingTurn(text: string): boolean {
 
 export async function executeTestCase(run: Run, tc: TestCase): Promise<TestCase> {
   const turns: Turn[] = []
+
+  // Prepend the greeting as the first agent turn — no LLM call needed
+  if (run.greetingText?.trim()) {
+    turns.push({
+      number: 1,
+      speaker: 'Agent',
+      text: run.greetingText.trim(),
+      timestamp: new Date().toISOString(),
+    })
+  }
+
   // Each "turn pair" is one Agent + one Lead. maxTurns controls pairs.
   const maxTotalTurns = run.maxTurns * 2
+  // Start after any pre-populated turns; lead always responds to a greeting first
+  const startTurn = turns.length + 1
 
   try {
-    for (let turnNumber = 1; turnNumber <= maxTotalTurns; turnNumber++) {
-      const isAgentTurn = turnNumber % 2 === 1
+    for (let turnNumber = startTurn; turnNumber <= maxTotalTurns; turnNumber++) {
+      // If we started with a greeting (turn 1 = Agent), turn 2 is Lead, turn 3 is Agent, etc.
+      const isAgentTurn = turns.length % 2 === 1
 
       if (isAgentTurn) {
-        const { text, tokens } = await agentTurn(run.promptText, turns)
+        const { text, tokens } = await agentTurn(run.promptText, turns, run.dynamicVariables)
         turns.push({
           number: turnNumber,
           speaker: 'Agent',
@@ -41,10 +55,10 @@ export async function executeTestCase(run: Run, tc: TestCase): Promise<TestCase>
           timestamp: new Date().toISOString(),
           tokens,
         })
-        // Hard stop on hangup_call — no turn guard
+        // Hard stop on hangup_call — do not let lead respond
         if (isHangupCall(text)) break
-        // Heuristic closing detection (only after first agent turn)
-        if (turnNumber > 1 && isClosingTurn(text)) break
+        // Heuristic closing detection (only after first exchange)
+        if (turns.length > 2 && isClosingTurn(text)) break
       } else {
         const { text, tokens } = await leadPersonaTurn(tc.leadBehaviourScript, turns)
         turns.push({
