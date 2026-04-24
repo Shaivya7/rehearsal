@@ -73,6 +73,63 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
         ))}
       </div>
 
+      {/* Run Inputs */}
+      <details className="group bg-surface border border-border rounded-lg overflow-hidden">
+        <summary className="flex items-center justify-between px-5 py-4 cursor-pointer select-none hover:bg-elevated transition-colors">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-ink-3">
+            Run Inputs
+          </p>
+          <span className="text-ink-3 text-xs font-mono group-open:hidden">▸ Show</span>
+          <span className="text-ink-3 text-xs font-mono hidden group-open:inline">▾ Hide</span>
+        </summary>
+
+        <div className="px-5 pb-5 space-y-5 border-t border-border">
+          {/* Prompt */}
+          <div className="pt-5">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-ink-3 mb-2">Prompt</p>
+            <p className="text-sm text-ink-2 leading-relaxed mb-3">{run.promptSummary}</p>
+            <details className="group/raw">
+              <summary className="text-[11px] font-mono text-ink-3 hover:text-gold cursor-pointer select-none transition-colors">
+                ▸ View raw prompt ({run.promptText.length.toLocaleString()} chars)
+              </summary>
+              <pre className="mt-2 text-[11px] font-mono text-ink-3 bg-bg border border-border rounded p-3 overflow-x-auto whitespace-pre-wrap max-h-64 leading-relaxed">
+                {run.promptText}
+              </pre>
+            </details>
+          </div>
+
+          {/* Greeting */}
+          {run.greetingText && (
+            <div className="border-t border-border pt-5">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-ink-3 mb-2">Greeting</p>
+              <p className="text-sm text-ink-2 leading-relaxed font-mono bg-bg border border-border rounded px-3 py-2">
+                {run.greetingText}
+              </p>
+            </div>
+          )}
+
+          {/* Dynamic Variables */}
+          {run.dynamicVariables && (
+            <div className="border-t border-border pt-5">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-ink-3 mb-2">Dynamic Variables</p>
+              <pre className="text-[11px] font-mono text-ink-2 bg-bg border border-border rounded px-3 py-2 whitespace-pre-wrap leading-relaxed">
+                {run.dynamicVariables}
+              </pre>
+            </div>
+          )}
+
+          {/* Config */}
+          <div className="border-t border-border pt-5">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-ink-3 mb-2">Config</p>
+            <div className="flex flex-wrap gap-4">
+              <span className="text-[11px] font-mono text-ink-2">Model: <span className="text-gold">{run.model}</span></span>
+              <span className="text-[11px] font-mono text-ink-2">Max turns: <span className="text-gold">{run.maxTurns}</span></span>
+              <span className="text-[11px] font-mono text-ink-2">Created: <span className="text-gold">{new Date(run.createdAt).toLocaleString()}</span></span>
+            </div>
+          </div>
+        </div>
+      </details>
+
       {/* Results */}
       <div>
         <div className="flex items-end justify-between mb-4">
