@@ -43,8 +43,8 @@ export async function executeTestCase(run: Run, tc: TestCase): Promise<TestCase>
 
   try {
     for (let turnNumber = startTurn; turnNumber <= maxTotalTurns; turnNumber++) {
-      // If we started with a greeting (turn 1 = Agent), turn 2 is Lead, turn 3 is Agent, etc.
-      const isAgentTurn = turns.length % 2 === 1
+      // Even turns.length means Agent is next (0→Agent, 1→Lead, 2→Agent, …)
+      const isAgentTurn = turns.length % 2 === 0
 
       if (isAgentTurn) {
         const { text, tokens } = await agentTurn(run.promptText, turns, run.dynamicVariables)
