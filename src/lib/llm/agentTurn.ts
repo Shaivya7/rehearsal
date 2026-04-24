@@ -23,7 +23,8 @@ export async function agentTurn(
     openai.chat.completions.create({
       model: MODEL,
       messages,
-      temperature: 0.3,
+      temperature: 0.7,
+      max_tokens: 250,
     })
   )
 
