@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import type { TestCase } from '@/lib/types'
 import { TestCaseRow } from './TestCaseRow'
@@ -88,13 +89,19 @@ export function TestCaseTable({ runId, initialTcs }: Props) {
               ))}
             </tbody>
           </table>
-          <div className="px-4 py-3 border-t border-border">
+          <div className="px-4 py-3 border-t border-border flex items-center justify-between gap-3">
             <button
               onClick={handleAdd}
               className="flex items-center gap-1.5 text-xs font-mono text-ink-3 hover:text-gold border border-dashed border-border hover:border-gold/40 rounded px-3 py-1.5 transition-colors duration-150"
             >
               <Plus size={12} /> Add Test Case
             </button>
+            <Link
+              href={`/runs/${runId}/execute`}
+              className="flex items-center gap-1.5 bg-gold text-bg text-xs font-semibold px-4 py-1.5 rounded hover:bg-gold/90 transition-colors"
+            >
+              Run All ({tcs.length}) →
+            </Link>
           </div>
         </>
       )}
