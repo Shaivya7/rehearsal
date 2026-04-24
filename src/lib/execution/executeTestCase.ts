@@ -3,6 +3,11 @@ import { leadPersonaTurn } from '../llm/leadPersonaTurn'
 import { analyseTranscript } from '../llm/analyseTranscript'
 import type { Run, TestCase, Turn } from '../types'
 
+// Hard stop: agent explicitly invoked hangup_call action
+function isHangupCall(text: string): boolean {
+  return text.toLowerCase().includes('hangup_call')
+}
+
 // Heuristic: detect if agent has issued a closing action
 function isClosingTurn(text: string): boolean {
   const lower = text.toLowerCase()
@@ -14,7 +19,6 @@ function isClosingTurn(text: string): boolean {
     lower.includes('thank you for your time') ||
     lower.includes('have a great day') ||
     lower.includes('take care') ||
-    lower.includes('hangup') ||
     lower.includes('end the conversation')
   )
 }
@@ -37,7 +41,9 @@ export async function executeTestCase(run: Run, tc: TestCase): Promise<TestCase>
           timestamp: new Date().toISOString(),
           tokens,
         })
-        // Check for closing action (only after first agent turn)
+        // Hard stop on hangup_call — no turn guard
+        if (isHangupCall(text)) break
+        // Heuristic closing detection (only after first agent turn)
         if (turnNumber > 1 && isClosingTurn(text)) break
       } else {
         const { text, tokens } = await leadPersonaTurn(tc.leadBehaviourScript, turns)
