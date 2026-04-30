@@ -41,22 +41,6 @@ export default async function RunDetailPage({ params }: { params: Promise<{ id: 
         )}
       </div>
 
-      {/* Prompt Summary */}
-      <div className="bg-surface border border-border rounded-lg p-5">
-        <p className="text-[10px] font-mono uppercase tracking-widest text-ink-3 mb-3">
-          Prompt Summary
-        </p>
-        <p className="text-sm text-ink-2 leading-relaxed">{run.promptSummary}</p>
-        <details className="mt-4">
-          <summary className="text-[11px] font-mono text-ink-3 hover:text-gold cursor-pointer select-none transition-colors">
-            ▸ View raw prompt ({run.promptText.length.toLocaleString()} chars)
-          </summary>
-          <pre className="mt-3 text-[11px] font-mono text-ink-3 bg-bg border border-border rounded p-3 overflow-x-auto whitespace-pre-wrap max-h-60 leading-relaxed">
-            {run.promptText}
-          </pre>
-        </details>
-      </div>
-
       {/* Test Cases */}
       <div>
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
