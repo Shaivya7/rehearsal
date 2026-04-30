@@ -10,6 +10,16 @@ Rehearsal is a QA tool for testing AI voice bot prompts before they go live. You
 4. **Get verdicts** - Every conversation is evaluated against its test objective. You get a PASS, FAIL, or PARTIAL verdict with a one-line reason.
 5. **Download a report** - Export results as an Excel file with a run summary, test case results, and full conversation transcripts.
 
+## Inputs
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| Run name | Yes | Label for this test run |
+| Prompt | Yes | The bot's full system prompt (paste or upload PDF/DOCX) |
+| Greeting message | No | The opening line the bot always sends first |
+| Dynamic variables | No | Key-value pairs like agent_name, product (upload a screenshot to auto-extract) |
+| Max turns | No | Conversation length limit per test case (6 to 24, default 16) |
+
 ## Tech stack
 
 - Next.js 16, React 19, TypeScript
