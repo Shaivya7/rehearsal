@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rehearsal
 
-## Getting Started
+Rehearsal is an internal QA tool for testing AI voice bot prompts before they go live. You paste your bot's system prompt, it auto-generates test cases, simulates full multi-turn conversations against a realistic lead persona, and gives you a pass/fail verdict for each scenario.
 
-First, run the development server:
+## What it does
+
+1. **Import a prompt** - Paste your bot system prompt directly or upload a PDF/DOCX file. Optionally add a greeting message and dynamic variables (agent name, product, etc.).
+2. **Generate test cases** - Rehearsal reads the prompt and generates diverse test cases covering happy paths, objections, edge cases, and failure modes.
+3. **Simulate conversations** - Each test case runs as a full multi-turn conversation. The bot follows your prompt; an LLM-powered lead persona responds realistically. Calls end on hangup or transfer.
+4. **Get verdicts** - Every conversation is evaluated against its test objective. You get a PASS, FAIL, or PARTIAL verdict with a one-line reason.
+5. **Download a report** - Export results as an Excel file with a run summary, test case results, and full conversation transcripts.
+
+## Tech stack
+
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- Vercel Blob (run storage)
+- OpenAI API (test case generation, lead persona, verdict analysis)
+
+## Local setup
+
+**Prerequisites:** Node.js 18+, an OpenAI API key, and a Vercel Blob store.
+
+```bash
+git clone https://github.com/Shaivya7/rehearsal.git
+cd rehearsal
+npm install
+```
+
+Create a `.env.local` file in the project root:
+
+```
+OPENAI_API_KEY=sk-...
+BLOB_READ_WRITE_TOKEN=vercel_blob_...
+```
+
+Then start the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The app is deployed on Vercel. To deploy your own instance:
 
-## Learn More
+```bash
+npx vercel --prod
+```
 
-To learn more about Next.js, take a look at the following resources:
+Make sure `OPENAI_API_KEY` and `BLOB_READ_WRITE_TOKEN` are set in your Vercel project environment variables.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## How a run works
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Step | What happens |
+|------|-------------|
+| Create run | Prompt is stored in Vercel Blob and a summary is generated via OpenAI |
+| Generate TCs | OpenAI reads the prompt and produces structured test cases with pass criteria |
+| Execute | Each test case runs as a live conversation loop until max turns or a hangup signal |
+| Analyse | The full transcript is sent to OpenAI for verdict scoring |
+| Results | Verdicts are displayed on the results page and available as an Excel download |
 
-## Deploy on Vercel
+## Input reference
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Field | Required | Description |
+|-------|----------|-------------|
+| Run name | Yes | Label for this test run |
+| Prompt | Yes | The bot's full system prompt (paste or upload PDF/DOCX) |
+| Greeting message | No | The opening line the bot always sends first |
+| Dynamic variables | No | Key-value pairs like agent_name, product (upload a screenshot to auto-extract) |
+| Max turns | No | Conversation length limit per test case (6 to 24, default 16) |
